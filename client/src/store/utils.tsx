@@ -14,7 +14,7 @@ export function createStoreAndProvider<StateType>(reducer: Reducer<StateType, an
     const Provider = ({ children }: { children: JSX.Element | JSX.Element[] }) => {
         const [ state, dispatch ] = useReducer(reducer, initialState);
 
-        const thunk = action => {
+        const thunk = (action: any) => {
             if (typeof action === 'function') {
                 action(dispatch);
             } else {
@@ -34,12 +34,9 @@ export function createStoreAndProvider<StateType>(reducer: Reducer<StateType, an
 
 export const combineReducers = (reducers: any) => {
     return (state: any, action: any) => {
-        const newState: any = {};
-
-        for (let key in state) {
-            newState[key] = reducers[key](state[key], action);
-        }
-
-        return newState;
+        return Object.keys(reducers).reduce((nextState: any, key) => {
+            nextState[key] = reducers[key](state[key], action)
+            return nextState
+        }, {})
     }
 }
