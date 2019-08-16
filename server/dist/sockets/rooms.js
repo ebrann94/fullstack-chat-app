@@ -10,6 +10,7 @@ function joinRoom(roomName, user) {
             users: [user]
         };
     }
+    console.log(rooms);
 }
 function getRooms() {
     return Object.keys(rooms);

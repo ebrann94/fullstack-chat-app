@@ -2,20 +2,24 @@ import { SendMessageData } from '../../../shared-types/types'
 import { Room, Message } from './chat-reducer';
 import ChatAPI from '../api/api'
 
-export const addMessage = (roomId: string, message: Message) => {
+export const addMessage = (roomName: string, message: Message) => {
     return {
         type: 'ADD_MESSAGE',
         payload: {
             message,
-            roomId
+            roomName
         }
     }
 }
 
-export const addRoom = (room: Room) => {
+export const addRoom = (room: string) => {
     return {
         type: 'ADD_ROOM',
-        room
+        room : {
+            id: '1234',
+            name: room,
+            messages: []
+        }
     }
 }
 
@@ -38,10 +42,21 @@ export const sendMessage = (room: string, author: string, text: string) => {
     }
 }
 
-export const subscribeToMessages = () => 
+export const joinRoom = (roomName: string, user: string) => {
+    return (dispatch: Function) => {
+        console.log(dispatch)
+        ChatAPI.joinRoom(roomName, user, (res: any) => {
+            console.log(res)
+            if (res === 'Success') {
+                dispatch(addRoom(roomName))
+            }
+        })
+    }
+}
+
+export const subscribeToMessages = (room: string) => 
     (dispatch: any) => {
         ChatAPI.subscribeToMessages((message: Message) => {
-
-            dispatch(addMessage('', message))
+            dispatch(addMessage(room, message))
         })
     }

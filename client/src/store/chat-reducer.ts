@@ -15,7 +15,7 @@ export const chatReducer = (state: Room[], action: any): Room[] => {
         case 'ADD_MESSAGE':
             const message = action.payload.message
             return state.map(room => {
-                if (room.id === action.payload.roomId) {
+                if (room.name === action.payload.roomName) {
                     return {
                         ...room,
                         messages: [...room.messages, message]

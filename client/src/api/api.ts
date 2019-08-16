@@ -29,7 +29,6 @@ const ChatAPI = (function() {
 
         getRooms(callback: Function) {
             console.log('getRooms called')
-            // socket.emit('getRooms', undefined, callback)
             socket.emit('getRooms', {}, callback)
         },
 

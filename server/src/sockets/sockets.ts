@@ -21,7 +21,7 @@ export const initSockets: Function = (server: http.Server) => {
 
         socket.on('sendMessage', ({ text, author, room }: SendMessageData) => {
             console.log('Message Sent')
-            socket.emit('message', createMessage(text, author, room))
+            io.to(room).emit('message', createMessage(text, author, room))
         })
 
         socket.on('getRooms', (data, callback) => {
@@ -32,11 +32,12 @@ export const initSockets: Function = (server: http.Server) => {
             callback(rooms)
         })
 
-        socket.on('joinRoom', ({ user, room}) => {
+        socket.on('joinRoom', ({ user, room }, callback) => {
             socket.join(room)
             joinRoom(room, user)
 
-            socket.to(room).emit('New User Joined')
+            callback('Success')
+            socket.to(room).emit('message', 'New User Joined')
         })
 
         socket.on('leaveRoom', ({ user, room }) => {

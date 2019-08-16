@@ -1,35 +1,46 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import { useAppContext } from './store/configure-store';
-import { addMessage, subscribeToMessages } from './store/chat-actions';
+import { addMessage, subscribeToMessages, joinRoom } from './store/chat-actions';
 import ChatAPI from './api/api'
-import { tsCallSignatureDeclaration } from '@babel/types';
 
 function App() {
-    const { dispatch } = useAppContext()
-    const [text, setText] = useState('')
+    const { state, dispatch } = useAppContext()
+    const [message, setMessage] = useState('')
+    const [room, setRoom] =  useState('')
+    const userName:string = 'Ethan'
+
+    console.log(state)
 
     useEffect(() => {
         // dispatch(subscribeToMessages())
         ChatAPI.subscribeToMessages((message: any) => {
             console.log('Message received', message)
+            dispatch(addMessage('room1', message))
         })
 
         
-        ChatAPI.getRooms((rooms: string[]) => {
-            console.log('Rooms Callback', rooms)
-        })
+        // ChatAPI.getRooms((rooms: string[]) => {
+        //     console.log('Rooms Callback', rooms)
+        // })
     }, [])
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
 
         ChatAPI.sendMessage({
-            text, 
+            text: message, 
             author: 'Ethan',
-            room: 'room1'
+            room: state.chat[0].name
         })
-        setText('')
+
+        setMessage('')
+    }
+
+    const handleRoomSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+
+        dispatch(joinRoom(room, userName))
     }
 
     const getRooms = () => {
@@ -40,22 +51,35 @@ function App() {
 
     return ( 
         <div className = "App" >
+            <form 
+                onSubmit={handleRoomSubmit}
+            >
+                <input 
+                    type="text"
+                    name="room"
+                    value={room}
+                    onChange={e => setRoom(e.target.value)}
+                />
+                <button>Join Room</button>
+            </form>
             <form
                 onSubmit={handleSubmit}
             >
                 <input 
                     type="text" 
                     name="message" 
-                    value={text}
-                    onChange={e => setText(e.target.value)}
+                    value={message}
+                    onChange={e => setMessage(e.target.value)}
                 />
                 <button>
-                    Submit
+                    Send Message
                 </button>
             </form>
             <button
                 onClick={getRooms}
-            >Get Rooms</button>
+            >
+                Get Rooms
+            </button>
         </div>
     );
 }

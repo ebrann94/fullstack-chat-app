@@ -12,18 +12,19 @@ exports.initSockets = function (server) {
         socket.on('sendMessage', function (_a) {
             var text = _a.text, author = _a.author, room = _a.room;
             console.log('Message Sent');
-            socket.emit('message', createMessage(text, author, room));
+            io.to(room).emit('message', createMessage(text, author, room));
         });
         socket.on('getRooms', function (data, callback) {
             console.log('Get rooms request');
             var rooms = getRooms();
             callback(rooms);
         });
-        socket.on('joinRoom', function (_a) {
+        socket.on('joinRoom', function (_a, callback) {
             var user = _a.user, room = _a.room;
             socket.join(room);
             joinRoom(room, user);
-            socket.to(room).emit('New User Joined');
+            callback('Success');
+            socket.to(room).emit('message', 'New User Joined');
         });
         socket.on('leaveRoom', function (_a) {
             var user = _a.user, room = _a.room;
