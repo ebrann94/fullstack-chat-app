@@ -5,7 +5,7 @@ import ChatAPI from '../api/api'
 import { Message } from '../store/chat-reducer'
 
 const SendMessage = () => {
-    const { dispatch } = useAppContext()
+    const [, dispatch ] = useAppContext()
 
     // const handleSendMessage = (text: any) => {
     //     ChatAPI.sendMessage(text, (message: Message) => {

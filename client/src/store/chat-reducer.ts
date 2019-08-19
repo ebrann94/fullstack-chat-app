@@ -5,9 +5,9 @@ export interface Message {
 }
 
 export interface Room {
-    id: string,
     name: string,
-    messages: Message[]
+    messages: Message[],
+    users: string[]
 }
 
 export const chatReducer = (state: Room[], action: any): Room[] => {
@@ -26,7 +26,18 @@ export const chatReducer = (state: Room[], action: any): Room[] => {
         case 'ADD_ROOM':
             return [...state, action.room]
         case 'DELETE_ROOM':
-            return state.filter(room => room.id !== action.id)
+            return state.filter(room => room.name !== action.roomName)
+        case 'ADD_USER':
+            return state.map(room => {
+                if (room.name === action.payload.room) {
+                    return {
+                        ...room,
+                        users: [...room.users, action.payload.user]
+                    }
+                } 
+
+                return room
+            })
         default:
             return state
     }

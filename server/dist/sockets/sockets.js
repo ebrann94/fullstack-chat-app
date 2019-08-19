@@ -7,29 +7,34 @@ var _a = require('./rooms'), joinRoom = _a.joinRoom, leaveRoom = _a.leaveRoom, g
 exports.initSockets = function (server) {
     var io = socketsio(server);
     io.on('connection', function (socket) {
-        console.log('Connection Received');
-        socket.emit('message', 'hello');
         socket.on('sendMessage', function (_a) {
             var text = _a.text, author = _a.author, room = _a.room;
-            console.log('Message Sent');
             io.to(room).emit('message', createMessage(text, author, room));
         });
         socket.on('getRooms', function (data, callback) {
-            console.log('Get rooms request');
             var rooms = getRooms();
             callback(rooms);
         });
         socket.on('joinRoom', function (_a, callback) {
             var user = _a.user, room = _a.room;
             socket.join(room);
-            joinRoom(room, user);
-            callback('Success');
-            socket.to(room).emit('message', 'New User Joined');
+            var joinedRoom = joinRoom(room, user);
+            // Send room info in callback
+            callback({
+                error: false,
+                room: joinedRoom
+            });
+            // Tell other room users a new user has joined
+            socket.to(room).emit('newUser', {
+                user: user,
+                room: room
+            });
         });
-        socket.on('leaveRoom', function (_a) {
+        socket.on('leaveRoom', function (_a, cb) {
             var user = _a.user, room = _a.room;
             socket.leave(room);
             leaveRoom(room, user);
+            cb();
             socket.to(room).emit('User has Left');
         });
         socket.on('disconnect', function () {

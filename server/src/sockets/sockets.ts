@@ -16,17 +16,12 @@ export const initSockets: Function = (server: http.Server) => {
     const io: SocketIO.Server = socketsio(server);
 
     io.on('connection', (socket: SocketIO.Socket) => {
-        console.log('Connection Received')
-        socket.emit('message', 'hello')
 
         socket.on('sendMessage', ({ text, author, room }: SendMessageData) => {
-            console.log('Message Sent')
             io.to(room).emit('message', createMessage(text, author, room))
         })
 
         socket.on('getRooms', (data, callback) => {
-
-            console.log('Get rooms request')
             const rooms = getRooms()
 
             callback(rooms)
@@ -34,16 +29,26 @@ export const initSockets: Function = (server: http.Server) => {
 
         socket.on('joinRoom', ({ user, room }, callback) => {
             socket.join(room)
-            joinRoom(room, user)
+            const joinedRoom = joinRoom(room, user)
 
-            callback('Success')
-            socket.to(room).emit('message', 'New User Joined')
+            // Send room info in callback
+            callback({
+                error: false,
+                room: joinedRoom
+            })
+            
+            // Tell other room users a new user has joined
+            socket.to(room).emit('newUser', {
+                user,
+                room
+            })
         })
 
-        socket.on('leaveRoom', ({ user, room }) => {
+        socket.on('leaveRoom', ({ user, room }, cb) => {
             socket.leave(room)
             leaveRoom(room, user)
 
+            cb()
             socket.to(room).emit('User has Left')
         })
         

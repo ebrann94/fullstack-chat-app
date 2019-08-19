@@ -1,31 +1,36 @@
 import { useContext } from 'react';
 import { createStoreAndProvider, combineReducers } from './utils';
 import { chatReducer, Room } from './chat-reducer';
+import { userReducer, userInitialState, IUserState } from './user-reducer'
 
-// Rooms state
-// Array of room
-
-interface IAppState {
-    chat: Room[]
+interface AppState {
+    chat: Room[],
+    user: IUserState
 }
-
-const combinedReducer = combineReducers({
-    chat: chatReducer
-})
 
 const initialState = {
-    chat: []
+    chat: [],
+    user: userInitialState
 }
 
-const [AppContext, AppContextProvider] = createStoreAndProvider<IAppState>(combinedReducer, initialState);
+const [AppContext, AppContextProvider] = createStoreAndProvider<AppState>(
+    combineReducers({
+        chat: chatReducer,
+        user: userReducer
+    }), 
+    initialState
+);
 
-const useAppContext = () => useContext(AppContext);
+const useAppContext = (func?: Function) => {
+    const context = useContext(AppContext)
 
-const useMapState = (func: Function) => {
-    const { state } = useContext(AppContext)
+    if (typeof func === 'undefined' && typeof func !== 'function') {
+        return context
+    }
 
-    return func !== undefined ? func(state) : state
-}
+    const [ state, dispatch ] = context
+    return [func(state), dispatch]
+};
 
 export {
     AppContext,

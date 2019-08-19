@@ -1,29 +1,31 @@
-import React, { createContext, useReducer, Reducer, Context } from 'react';
+import React, { createContext, useReducer, useRef, Reducer, Context } from 'react';
 
-type AppContext<StateType> = Context<{ state: StateType, dispatch: any}>
+// type AppContext<StateType> = Context<[{ state: StateType, dispatch: any }]>
+type AppContext<StateType> = Context<[StateType, any ]>
 
 export function createStoreAndProvider<StateType>(reducer: Reducer<StateType, any>, initialState: StateType): 
     [AppContext<StateType> , Function] 
 {
     
-    const context: AppContext<StateType> = createContext({
-        state: initialState,
-        dispatch: null
-    });
+    const context: AppContext<StateType> = createContext([ initialState, null ]);
 
     const Provider = ({ children }: { children: JSX.Element | JSX.Element[] }) => {
         const [ state, dispatch ] = useReducer(reducer, initialState);
 
+        const stateRef = useRef(state)
+        stateRef.current = state
+        const getState = () => stateRef.current
+
         const thunk = (action: any) => {
             if (typeof action === 'function') {
-                action(dispatch);
+                action(dispatch, getState);
             } else {
                 dispatch(action);
             }
         }
 
         return (
-            <context.Provider value={{ state, dispatch: thunk }}>
+            <context.Provider value={[ state, thunk]}>
                 { children }
             </context.Provider>
         )

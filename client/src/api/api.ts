@@ -22,19 +22,27 @@ const ChatAPI = (function() {
             })
         },
 
+        subscribeToRoomUpdates(room: string, callback: Function) {
+            socket.on('newUser', (res: any) => {
+                
+            })
+        },
+
         sendMessage(data: SendMessageData) {
-            // console.log('Message sent')
             socket.emit('sendMessage', data);
         },
 
         getRooms(callback: Function) {
-            console.log('getRooms called')
             socket.emit('getRooms', {}, callback)
         },
 
         joinRoom(roomName: string, user: string, callback: Function) {
             socket.emit('joinRoom', { room: roomName, user }, callback)
-        }
+        },
+
+        leaveRoom() {
+
+        },
     }
 })();
 

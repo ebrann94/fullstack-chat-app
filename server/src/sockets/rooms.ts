@@ -25,7 +25,7 @@ function joinRoom(roomName: string, user: IUser) {
         }
     }
 
-    console.log(rooms)
+    return rooms[roomName]
 }
 
 function getRooms(): string[] {
@@ -40,8 +40,15 @@ function leaveRoom(roomName: string, user: any) {
     }
 }
 
+function removeUserFromRooms(user: string) {
+    Object.keys(rooms).forEach(key => {
+        rooms[key].users = rooms[key].users.filter(u => u.name !== user);
+    })
+}
+
 module.exports = {
     joinRoom,
     getRooms,
-    leaveRoom
+    leaveRoom,
+    removeUserFromRooms
 }

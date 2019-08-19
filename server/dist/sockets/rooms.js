@@ -10,7 +10,7 @@ function joinRoom(roomName, user) {
             users: [user]
         };
     }
-    console.log(rooms);
+    return rooms[roomName];
 }
 function getRooms() {
     return Object.keys(rooms);
@@ -21,8 +21,14 @@ function leaveRoom(roomName, user) {
         delete rooms[roomName];
     }
 }
+function removeUserFromRooms(user) {
+    Object.keys(rooms).forEach(function (key) {
+        rooms[key].users = rooms[key].users.filter(function (u) { return u.name !== user; });
+    });
+}
 module.exports = {
     joinRoom: joinRoom,
     getRooms: getRooms,
-    leaveRoom: leaveRoom
+    leaveRoom: leaveRoom,
+    removeUserFromRooms: removeUserFromRooms
 };
