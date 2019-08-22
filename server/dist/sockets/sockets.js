@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // import { SendMessageData } from '../../../shared-types/types'
 var socketsio = require('socket.io');
 var uuid = require('uuid');
-var _a = require('./rooms'), joinRoom = _a.joinRoom, leaveRoom = _a.leaveRoom, getRooms = _a.getRooms;
+var _a = require('./rooms'), joinRoom = _a.joinRoom, leaveRoom = _a.leaveRoom, getRooms = _a.getRooms, removeUserById = _a.removeUserById, doesUserExist = _a.doesUserExist;
 exports.initSockets = function (server) {
     var io = socketsio(server);
     io.on('connection', function (socket) {
@@ -15,10 +15,36 @@ exports.initSockets = function (server) {
             var rooms = getRooms();
             callback(rooms);
         });
-        socket.on('joinRoom', function (_a, callback) {
-            var user = _a.user, room = _a.room;
+        socket.on('checkUsernameAvailability', function (_a, callback) {
+            var username = _a.username;
+            if (doesUserExist(username)) {
+                callback('Error');
+            }
+            else {
+                callback();
+            }
+        });
+        socket.on('firstRoomJoin', function (_a, callback) {
+            var username = _a.username, room = _a.room;
+            if (doesUserExist(username)) {
+                callback({ error: 'Username Taken' });
+                return;
+            }
             socket.join(room);
-            var joinedRoom = joinRoom(room, user);
+            var joinedRoom = joinRoom(room, { username: username, socketId: socket.id });
+            callback({
+                error: false,
+                room: joinedRoom
+            });
+            socket.to(room).emit('newUser', {
+                user: username,
+                room: room
+            });
+        });
+        socket.on('joinRoom', function (_a, callback) {
+            var username = _a.username, room = _a.room;
+            socket.join(room);
+            var joinedRoom = joinRoom(room, { username: username, socketId: socket.id });
             // Send room info in callback
             callback({
                 error: false,
@@ -26,7 +52,7 @@ exports.initSockets = function (server) {
             });
             // Tell other room users a new user has joined
             socket.to(room).emit('newUser', {
-                user: user,
+                user: username,
                 room: room
             });
         });
@@ -38,6 +64,7 @@ exports.initSockets = function (server) {
             socket.to(room).emit('User has Left');
         });
         socket.on('disconnect', function () {
+            removeUserById(socket.id);
         });
     });
 };

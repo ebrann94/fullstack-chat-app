@@ -1,9 +1,20 @@
 import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
 import './App.css';
 import { useAppContext } from './store/configure-store';
-import { addMessage, subscribeToMessages, joinRoom, sendMessage } from './store/chat-actions';
+import { addMessage, subscribeToMessages, joinRoom, sendMessage, subscribeToRoomUpdates } from './store/chat-actions';
 import * as UserActions from './store/user-actions'
 import ChatAPI from './api/api'
+
+import Chat from './components/Chat';
+import Sidebar from './components/Sidebar';
+import LoginModal from './components/LoginModal';
+
+const AppWrapper = styled.div`
+    display: grid;
+    grid-template-columns: 256px 1fr;
+    grid-template-rows: 1fr;
+`
 
 function App() {
     const [ state, dispatch ] = useAppContext()
@@ -21,23 +32,14 @@ function App() {
             dispatch(addMessage('room1', message))
         })
 
-        
-        // ChatAPI.getRooms((rooms: string[]) => {
-        //     console.log('Rooms Callback', rooms)
-        // })
+        dispatch(subscribeToRoomUpdates())
+        dispatch(UserActions.getAvailableRooms())
     }, [])
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
 
-        ChatAPI.sendMessage({
-            text: message, 
-            author: state.user.username,
-            room: state.chat[0].name
-        })
-
-        // dispatch(sendMessage(message))
-
+        dispatch(sendMessage(message))
         setMessage('')
     }
 
@@ -60,47 +62,11 @@ function App() {
     }
 
     return ( 
-        <div className = "App" >
-            <form
-                onSubmit={handleUsernameSubmit}
-            >
-                <input 
-                    type="text"
-                    value={username}
-                    onChange={e => setUsername(e.target.value)}
-                />
-                <button>Submit Username</button>
-            </form>
-            <form 
-                onSubmit={handleRoomSubmit}
-            >
-                <input 
-                    type="text"
-                    name="room"
-                    value={room}
-                    onChange={e => setRoom(e.target.value)}
-                />
-                <button>Join Room</button>
-            </form>
-            <form
-                onSubmit={handleSubmit}
-            >
-                <input 
-                    type="text" 
-                    name="message" 
-                    value={message}
-                    onChange={e => setMessage(e.target.value)}
-                />
-                <button>
-                    Send Message
-                </button>
-            </form>
-            <button
-                onClick={getRooms}
-            >
-                Get Rooms
-            </button>
-        </div>
+        <AppWrapper className = "App" >
+            {state.user.username.length === 0 && <LoginModal />}
+            <Sidebar />
+            <Chat />
+        </AppWrapper>
     );
 }
 

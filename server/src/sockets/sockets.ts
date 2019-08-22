@@ -1,10 +1,11 @@
 import * as SocketIO from 'socket.io';
 import * as http from 'http';
+import { callbackify } from 'util';
 // import { SendMessageData } from '../../../shared-types/types'
 
 const socketsio = require('socket.io');
 const uuid = require('uuid');
-const { joinRoom, leaveRoom, getRooms } = require('./rooms');
+const { joinRoom, leaveRoom, getRooms, removeUserById, doesUserExist } = require('./rooms');
 
 export interface SendMessageData {
     text: string,
@@ -23,13 +24,42 @@ export const initSockets: Function = (server: http.Server) => {
 
         socket.on('getRooms', (data, callback) => {
             const rooms = getRooms()
-
             callback(rooms)
         })
 
-        socket.on('joinRoom', ({ user, room }, callback) => {
+        socket.on('checkUsernameAvailability', ({ username }, callback) => {
+            
+            if (doesUserExist(username)) {
+                callback('Error')
+            } else {
+                callback()
+            }
+        })
+
+        socket.on('firstRoomJoin', ({ username, room }, callback) => {
+            if (doesUserExist(username)) {
+                callback({ error: 'Username Taken' });
+                return;
+            }
+
             socket.join(room)
-            const joinedRoom = joinRoom(room, user)
+            const joinedRoom = joinRoom(room, { username, socketId: socket.id });
+
+            callback({
+                error: false,
+                room: joinedRoom
+            })
+
+            socket.to(room).emit('newUser', {
+                user: username,
+                room
+            })
+
+        })
+
+        socket.on('joinRoom', ({ username, room }, callback) => {
+            socket.join(room)
+            const joinedRoom = joinRoom(room, { username, socketId: socket.id })
 
             // Send room info in callback
             callback({
@@ -39,7 +69,7 @@ export const initSockets: Function = (server: http.Server) => {
             
             // Tell other room users a new user has joined
             socket.to(room).emit('newUser', {
-                user,
+                user: username,
                 room
             })
         })
@@ -53,7 +83,7 @@ export const initSockets: Function = (server: http.Server) => {
         })
         
         socket.on('disconnect', () => {
-
+            removeUserById(socket.id)
         })
     });
 }

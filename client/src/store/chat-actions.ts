@@ -30,12 +30,13 @@ export const deleteRoom = (roomId: string) => {
     }
 }
 
-export const sendMessage = (room: string, text: string) => {
+export const sendMessage = (text: string) => {
     return (dispatch: any, getState: Function)=> {
+        const state = getState()
         const data: SendMessageData = {
             text,
-            room,
-            author: getState().user.username
+            room: state.user.currentViewedRoom,
+            author: state.user.username
         }
 
         ChatAPI.sendMessage(data)
@@ -71,10 +72,10 @@ const addUserToRoom = (room: string, user: string) => {
     }
 }
 
-export const subscribeToRoomUpdates = (room: string) => {
+export const subscribeToRoomUpdates = () => {
     return (dispatch: any) => {
-        ChatAPI.subscribeToRoomUpdates(room, (updates: any) => {
-            dispatch(addUserToRoom(room, updates.user))
+        ChatAPI.subscribeToRoomUpdates((res: any) => {
+            dispatch(addUserToRoom(res.room, res.user))
         })
     }
 }

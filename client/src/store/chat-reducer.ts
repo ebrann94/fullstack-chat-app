@@ -38,6 +38,8 @@ export const chatReducer = (state: Room[], action: any): Room[] => {
 
                 return room
             })
+        case 'SET_USERNAME_AND_ADD_ROOM':
+            return [...state, action.room]
         default:
             return state
     }

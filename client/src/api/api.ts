@@ -22,10 +22,8 @@ const ChatAPI = (function() {
             })
         },
 
-        subscribeToRoomUpdates(room: string, callback: Function) {
-            socket.on('newUser', (res: any) => {
-                
-            })
+        subscribeToRoomUpdates(callback: Function) {
+            socket.on('newUser', callback)
         },
 
         sendMessage(data: SendMessageData) {
@@ -43,6 +41,14 @@ const ChatAPI = (function() {
         leaveRoom() {
 
         },
+
+        checkUsername(username: string, callback: Function) {
+            socket.emit('checkUsernameAvailability', { username }, callback)
+        },
+
+        firstRoomJoin(username: string, room: string, callback: Function) {
+            socket.emit('firstRoomJoin', { username, room }, callback)
+        }
     }
 })();
 

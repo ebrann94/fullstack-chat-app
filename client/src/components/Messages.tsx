@@ -3,7 +3,13 @@ import { useAppContext } from '../store/configure-store'
 
 const Messages = () => {
     const [ messages ] = useAppContext((state: any) => {
-        return state.chat.find((room: string) => room === state.user.currentlyViewedRoom).messages
+        const found = state.chat.find((room: string) => room === state.user.currentlyViewedRoom)
+
+        if (found) {
+            return found
+        }
+
+        return []
     })
 
     return (
@@ -12,7 +18,7 @@ const Messages = () => {
                 messages.map((message: any) => {
                     return (
                         <div>
-                            message.content
+                            {message.text}
                         </div>
                     )
                 })

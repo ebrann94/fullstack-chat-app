@@ -1,25 +1,31 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useAppContext } from '../store/configure-store'
-import { addMessage, sendMessage } from '../store/chat-actions'
-import ChatAPI from '../api/api'
-import { Message } from '../store/chat-reducer'
+import { sendMessage } from '../store/chat-actions'
 
 const SendMessage = () => {
-    const [, dispatch ] = useAppContext()
+    const [ , dispatch ] = useAppContext()
+    const [messageText, setMessageText] = useState('')
 
-    // const handleSendMessage = (text: any) => {
-    //     ChatAPI.sendMessage(text, (message: Message) => {
-    //         dispatch(addMessage('', message))
-    //     })
-    // }
+    const handleSubmit= (e: React.FormEvent) => {
+        e.preventDefault()
 
-    // const handleSendMessage2 = (text: any) => {
-    //     dispatch(sendMessage('', '', text))
-    // }
+        dispatch(sendMessage(messageText))
+        setMessageText('')
+    }
 
     return (
         <div>
-
+            <form
+                onSubmit={handleSubmit}
+            >
+                <input 
+                    type="text"
+                    placeholder="Send Message"
+                    value={messageText}
+                    onChange={e => setMessageText(e.target.value)}
+                />
+                <button>Send</button>
+            </form>
         </div>
     )
 }
