@@ -21,8 +21,8 @@ function joinRoom(roomName, user) {
             users: [user]
         };
     }
-    console.log(rooms[roomName].users);
-    return rooms[roomName];
+    console.log(rooms);
+    return __assign({}, rooms[roomName], { users: rooms[roomName].users.map(function (user) { return user.username; }) });
 }
 function getRooms() {
     return Object.keys(rooms);

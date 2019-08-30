@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAppContext } from '../store/configure-store';
 import { checkUserName, joinFirstRoom } from '../store/user-actions';
+import { Input, Button } from './Styled';
 
 const ModalWrapper = styled.div`
     position: absolute;
@@ -11,7 +12,7 @@ const ModalWrapper = styled.div`
     width: 100vw;
     height: 100vh;
 
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.7);
 
     display: flex;
     justify-content: center;
@@ -23,19 +24,22 @@ const FormCard = styled.div`
     margin: 96px 0 0 0;
     padding: 16px;
     border-radius: 3px;
+
+    text-align: center;
 `
 
-const StyledForm = styled.form`
+const Form = styled.form`
     display: flex;
     flex-direction: column;
 `
 
-const Input = styled.input`
-    width: 200px;
+const Select = styled.select`
     margin: 0 0 16px 0;
     padding: 8px;
-    border-radius: 3px;
-    border: 1px solid rgba(0, 0, 0, 0.2);
+
+    -webkit-appearance: none;
+
+    font-family: 'Quicksand', sans-serif;
 `
 
 const LoginModal = () => {
@@ -81,7 +85,7 @@ const LoginModal = () => {
         <ModalWrapper>
             <FormCard>
                 <p>Join a Chat!</p>
-                <StyledForm
+                <Form
                     onSubmit={handleSubmit}
                 >
                     <Input
@@ -91,7 +95,7 @@ const LoginModal = () => {
                         value={fields.username}
                         onChange={handleChange}
                     />
-                    <select 
+                    {/* <Select 
                         name="room_select" 
                         value={fields.room_select}
                         onChange={handleChange}
@@ -106,16 +110,16 @@ const LoginModal = () => {
                                 </option>
                             ))
                         }
-                    </select>
+                    </Select> */}
                     <Input 
                         type="text"
                         name="room"
-                        placeholder="Room"
+                        placeholder="Create a new room"
                         value={fields.room}
                         onChange={handleChange}
                     />
-                    <button>Join</button>
-                </StyledForm>
+                    <Button>Join</Button>
+                </Form>
             </FormCard>
         </ModalWrapper>
     )

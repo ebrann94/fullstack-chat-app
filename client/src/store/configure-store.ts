@@ -24,13 +24,29 @@ const [AppContext, AppContextProvider] = createStoreAndProvider<AppState>(
 const useAppContext = (func?: Function) => {
     const context = useContext(AppContext)
 
-    if (typeof func === 'undefined' && typeof func !== 'function') {
+    if (typeof func === 'undefined' || typeof func !== 'function') {
         return context
     }
 
     const [ state, dispatch ] = context
     return [func(state), dispatch]
 };
+
+export const useAppState = (func?: Function) => {
+    const [ state ] = useContext(AppContext)
+
+    if (typeof func === 'function') {
+        return func(state)
+    }
+
+    return state
+}
+
+export const useDispatch = () => {
+    const [, dispatch ] = useContext(AppContext)
+
+    return dispatch
+}
 
 export {
     AppContext,

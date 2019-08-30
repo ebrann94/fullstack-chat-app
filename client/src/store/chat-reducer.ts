@@ -1,3 +1,4 @@
+
 export interface Message {
     id: string,
     author: string,
@@ -24,6 +25,7 @@ export const chatReducer = (state: Room[], action: any): Room[] => {
                 return room
             })
         case 'ADD_ROOM':
+            console.log("Add room action", action.room)
             return [...state, action.room]
         case 'DELETE_ROOM':
             return state.filter(room => room.name !== action.roomName)

@@ -22,7 +22,11 @@ export const userNameError = () => ({
 export const setUsernameAddRoom = (username: string, room: any) => ({
     type: 'SET_USERNAME_AND_ADD_ROOM',
     username,
-    room
+    room: {
+        name: room.name,
+        users: room.users,
+        messages: []
+    }
 })
 
 export const getAvailableRooms = () => 

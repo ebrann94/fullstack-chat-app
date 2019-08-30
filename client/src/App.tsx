@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import './App.css';
+import React, { useEffect } from 'react';
+import styled, { createGlobalStyle } from 'styled-components';
 import { useAppContext } from './store/configure-store';
-import { addMessage, subscribeToMessages, joinRoom, sendMessage, subscribeToRoomUpdates } from './store/chat-actions';
+import { addMessage, subscribeToRoomUpdates } from './store/chat-actions';
 import * as UserActions from './store/user-actions'
 import ChatAPI from './api/api'
 
@@ -10,59 +9,46 @@ import Chat from './components/Chat';
 import Sidebar from './components/Sidebar';
 import LoginModal from './components/LoginModal';
 
+const GlobalStyle = createGlobalStyle`
+    @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+    @import url('https://fonts.googleapis.com/css?family=Quicksand&display=swap');
+
+    body {
+        margin: 0;
+    }
+`
+
 const AppWrapper = styled.div`
+    /* font-family: 'Open Sans', sans-serif; */
+    font-family: 'Quicksand', sans-serif;
+    -webkit-font-smoothin: antialiased;
+    -moz-font-smoothing: grayscale;
+
     display: grid;
-    grid-template-columns: 256px 1fr;
+    grid-template-columns: 320px 1fr;
     grid-template-rows: 1fr;
+
+    height: 100vh;
 `
 
 function App() {
-    const [ state, dispatch ] = useAppContext()
-    const [message, setMessage] = useState('')
-    const [room, setRoom] =  useState('')
-    const [username, setUsername] = useState('')
-    const userName:string = 'Ethan'
-
+    const [ state, dispatch ] = useAppContext() 
     console.log('State', state)
 
     useEffect(() => {
         // dispatch(subscribeToMessages())
         ChatAPI.subscribeToMessages((message: any) => {
             console.log('Message received', message)
-            dispatch(addMessage('room1', message))
+            dispatch(addMessage(message))
         })
 
         dispatch(subscribeToRoomUpdates())
         dispatch(UserActions.getAvailableRooms())
     }, [])
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-
-        dispatch(sendMessage(message))
-        setMessage('')
-    }
-
-    const handleRoomSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-
-        dispatch(joinRoom(room, userName))
-    }
-
-    const handleUsernameSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-
-        dispatch(UserActions.setUsername(username))
-    }
-
-    const getRooms = () => {
-        ChatAPI.getRooms((rooms: string[]) => {
-            console.log('Rooms Callback', rooms)
-        })
-    }
-
     return ( 
         <AppWrapper className = "App" >
+            <GlobalStyle />
             {state.user.username.length === 0 && <LoginModal />}
             <Sidebar />
             <Chat />

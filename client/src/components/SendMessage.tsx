@@ -1,9 +1,27 @@
 import React, { useState } from 'react'
-import { useAppContext } from '../store/configure-store'
+import styled from 'styled-components';
+import { useAppContext, useDispatch } from '../store/configure-store'
 import { sendMessage } from '../store/chat-actions'
+import { Button, Input } from './Styled';
+
+const Wrapper = styled.div`
+    width: 100%;
+`
+
+const Form = styled.form`
+    display: flex;
+    padding: 16px;
+`
+
+const MessageInput = styled(Input)`
+    flex-grow: 1;
+
+    padding: 16px;
+    margin: 0 16px 0 0;
+`
 
 const SendMessage = () => {
-    const [ , dispatch ] = useAppContext()
+    const dispatch = useDispatch()
     const [messageText, setMessageText] = useState('')
 
     const handleSubmit= (e: React.FormEvent) => {
@@ -14,19 +32,23 @@ const SendMessage = () => {
     }
 
     return (
-        <div>
-            <form
+        <Wrapper>
+            <Form
                 onSubmit={handleSubmit}
             >
-                <input 
+                <MessageInput 
                     type="text"
-                    placeholder="Send Message"
+                    placeholder="Type a message"
                     value={messageText}
                     onChange={e => setMessageText(e.target.value)}
                 />
-                <button>Send</button>
-            </form>
-        </div>
+                <Button
+                    width="80px"
+                >
+                    Send
+                </Button>
+            </Form>
+        </Wrapper>
     )
 }
 

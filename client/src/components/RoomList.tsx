@@ -7,6 +7,8 @@ const RoomList = () => {
         return state.chat
     })
 
+    console.log(rooms);
+
     return (
         <div>
             {

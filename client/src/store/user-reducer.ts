@@ -46,7 +46,8 @@ export const userReducer = (state: IUserState, action : any):IUserState => {
             return {
                 ...state,
                 username: action.username,
-                usernameError: false
+                usernameError: false,
+                currentViewedRoom: action.room.name
             }
         default:
             return state

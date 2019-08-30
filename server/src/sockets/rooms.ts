@@ -24,8 +24,11 @@ function joinRoom(roomName: string, user: IUser) {
             users: [ user ]
         }
     }
-    console.log(rooms[roomName].users)
-    return rooms[roomName]
+    console.log(rooms);
+    return {
+        ...rooms[roomName],
+        users: rooms[roomName].users.map(user => user.username)
+    }
 }
 
 function getRooms(): string[] {

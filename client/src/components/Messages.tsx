@@ -1,29 +1,37 @@
 import React from 'react';
-import { useAppContext } from '../store/configure-store'
+import styled from 'styled-components';
+import { useAppContext } from '../store/configure-store';
+import Message from './Message';
+
+const MessagesWrapper = styled.div`
+    flex-grow: 1;
+`
 
 const Messages = () => {
     const [ messages ] = useAppContext((state: any) => {
-        const found = state.chat.find((room: string) => room === state.user.currentlyViewedRoom)
+        const found = state.chat.find((room: any) => room.name === state.user.currentViewedRoom)
 
         if (found) {
-            return found
+            return found.messages
         }
 
         return []
     })
 
     return (
-        <div>
+        <MessagesWrapper>
             {
                 messages.map((message: any) => {
                     return (
-                        <div>
-                            {message.text}
-                        </div>
+                        <Message
+                            text={message.text}
+                            author={message.author}
+                            createdAt={message.createdAt}
+                        />
                     )
                 })
             }
-        </div>
+        </MessagesWrapper>
     )
 }
 

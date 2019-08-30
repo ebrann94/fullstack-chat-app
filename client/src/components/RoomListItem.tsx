@@ -19,7 +19,7 @@ const RoomListItem = ({ name, unread }: Props) => {
         <div
             onClick={handleChangeRoom}
         >
-
+            <p>{name}</p>
         </div>
     )
 }
